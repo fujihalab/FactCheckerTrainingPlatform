@@ -1,4 +1,4 @@
-const quiz_address = "0xbB7c9B30e2494247f2B5F513Cd94830BB43bCCD0";
-const token_address = "0x60e4999c31f497c02b784E9B138dC000d30d2068";
+const quiz_address = "0x3d243D5f9392126756E96c2d7863364A351Ba862";
+const token_address = "0xAF5C275680A79D8f942D4695eEcba2E0E8E098C2";
 
 export {quiz_address, token_address};

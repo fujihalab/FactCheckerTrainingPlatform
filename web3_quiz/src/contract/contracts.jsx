@@ -190,43 +190,28 @@ class Contracts_MetaMask {
         }
     }
 
-    async investment_to_quiz(id, amount, isNotPayingOut, numOfStudent) {
-        console.log([id, amount, isNotPayingOut, numOfStudent]);
+    async investment_to_quiz(id, amount, numOfStudent) {
+        console.log([id, amount, numOfStudent]);
         let res = null;
         let hash = null;
-        let is_not_paying_out = null;
         amount = amount * 10 ** 18;
-
-        if (isNotPayingOut === "false") {
-            is_not_paying_out = false;
-        } else {
-            is_not_paying_out = true;
-        }
         try {
             if (ethereum) {
                 let account = await this.get_address();
                 let approval = await token.read.allowance({account, args: [account, quiz_address]});
-                console.log(Number(approval));
-                console.log(amount * numOfStudent);
                 if (Number(approval) >= Number(amount * numOfStudent)) {
-                    console.log("approveのかち");
-                } else {
-                    console.log("払う量の価値");
-                }
-
-                if (Number(approval) >= Number(amount * numOfStudent)) {
+                    console.log("invest11");
+                    console.log("invest111");
+                    hash = await this._investment_to_quiz(account, id, amount, numOfStudent);
                     if (hash) {
                         res = await publicClient.waitForTransactionReceipt({hash});
-                        hash = await this._investment_to_quiz(account, id, amount, is_not_paying_out, numOfStudent);
-                        if (hash) {
-                            res = await publicClient.waitForTransactionReceipt({hash});
-                        }
                     }
                 } else {
                     hash = await this.approve(account, amount * numOfStudent);
                     if (hash) {
+                        console.log("invest111");
                         res = await publicClient.waitForTransactionReceipt({hash});
-                        hash = await this._investment_to_quiz(account, Number(id), Number(amount), is_not_paying_out, Number(numOfStudent));
+                        hash = await this._investment_to_quiz(account, id, amount, numOfStudent);
                         console.log(hash);
                         if (hash) {
                             res = await publicClient.waitForTransactionReceipt({hash});
@@ -242,18 +227,17 @@ class Contracts_MetaMask {
         //document.location.href = "/edit_list";
     }
 
-    async _investment_to_quiz(account, id, amount, isNotPayingOut, numOfStudent) {
+    async _investment_to_quiz(account, id, amount, numOfStudent) {
         try {
+            console.log("invest");
             if (ethereum) {
-                //console.log(title, explanation, thumbnail_url, content, answer_type, answer_data, correct, epochStartSeconds, epochEndSeconds, reward, correct_limit);
-                console.log(await quiz.read.sum_of_investment({account, args: [amount, numOfStudent]}));
                 try {
                     const {request} = await publicClient.simulateContract({
                         account,
                         address: quiz_address,
                         abi: quiz_abi,
                         functionName: "investment_to_quiz",
-                        args: [Number(id), Number(amount), isNotPayingOut, Number(numOfStudent)],
+                        args: [Number(id), Number(amount), Number(numOfStudent)],
                     });
 
                     return await walletClient.writeContract(request);
@@ -296,7 +280,7 @@ class Contracts_MetaMask {
                     }
                 }
                 console.log("create_quiz_cont");
-                document.location.href = process.env.PUBLIC_URL + "/answer_quiz/" + parseInt(res.logs[2].topics[2], 16);
+                document.location.href = process.env.PUBLIC_URL + "/answer_quiz/" + parseInt(res.logs[0].topics[2], 16);
             } else {
                 setShow(false);
                 console.log("Ethereum object does not exist");
@@ -413,14 +397,13 @@ class Contracts_MetaMask {
                 let hash = await this._post_answer(account, id, answer);
 
                 if (hash) {
-                    // const res1 = await quiz.read.post_answer_view({account,args:[id, answer.toString()]})
-                    // console.log(res1);
-                    // if (res1 == true) {
-                    //     setContent("正解です！待機すると、マイページに遷移します");
-                    // }
-                    // else {
-                    //     setContent("不正解です。待機すると、マイページに遷移します");
-                    // }
+                    const res1 = await quiz.read.post_answer_view({account, args: [id, answer.toString()]});
+                    console.log(res1);
+                    if (res1 == true) {
+                        setContent("正解です！待機すると、マイページに遷移します");
+                    } else {
+                        setContent("不正解です。待機すると、マイページに遷移します");
+                    }
                     let res = await publicClient.waitForTransactionReceipt({hash});
                     console.log(res);
                     document.location.href = process.env.PUBLIC_URL + "/user_page/" + account;
@@ -444,7 +427,6 @@ class Contracts_MetaMask {
                 functionName: "post_answer",
                 args: [id, answer.toString()],
             });
-            console.log("正常そう");
             return await walletClient.writeContract(request);
         } catch (e) {
             console.log(e);
@@ -457,12 +439,14 @@ class Contracts_MetaMask {
 
     async get_quiz(id) {
         const answer_typr = await quiz.read.get_quiz_answer_type({args: [id]});
-        const res = await quiz.read.get_quiz({args: [id]});
+        let account = await this.get_address();
+        const res = await quiz.read.get_quiz({account: account, args: [id]});
         return [...res, answer_typr];
     }
 
     async get_quiz_simple(id) {
-        return await quiz.read.get_quiz_simple({args: [id]});
+        let account = await this.get_address();
+        return await quiz.read.get_quiz_simple({account: account, args: [id]});
     }
 
     async get_quiz_all_data_list(start, end) {

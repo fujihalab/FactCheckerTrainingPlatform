@@ -1,11 +1,17 @@
-import { Contracts_MetaMask } from "../../contract/contracts";
+import {Contracts_MetaMask} from "../../contract/contracts";
 import Form from "react-bootstrap/Form";
-import { useState, useEffect } from "react";
-import MDEditor, { selectWord } from "@uiw/react-md-editor";
-import { useParams } from "react-router-dom";
+import {useState, useEffect} from "react";
+import MDEditor, {selectWord} from "@uiw/react-md-editor";
+import {useParams} from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Wait_Modal from "../../contract/wait_Modal";
-import { ConstructorFragment } from "ethers/lib/utils";
+import {ConstructorFragment} from "ethers/lib/utils";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Image from "react-bootstrap/Image";
+import Simple_quiz from "./quiz_simple";
+
 function Answer_type1(props) {
     return (
         <>
@@ -122,7 +128,7 @@ function Answer_quiz(props) {
     console.log(id);
     console.log("解答の最大数とこれまでに回答した人数");
     async function getCorrectLimitAndCorrectCount(id) {
-        return (await Contract.get_respondentCount_and_respondentLimit(id));
+        return await Contract.get_respondentCount_and_respondentLimit(id);
     }
 
     console.log(getCorrectLimitAndCorrectCount(id));
@@ -148,52 +154,39 @@ function Answer_quiz(props) {
         setnow(Math.floor(new Date().getTime() / 1000));
     }, []);
 
+    console.log(simple_quiz);
     if (quiz && simple_quiz) {
-        // console.log(quiz)
-        // console.log(simple_quiz)
         return (
-            <>
-                <h3 style={{ margin: "50px" }}>{Number(simple_quiz["state"]) == 0 ? "初回の回答です。正解するとトークンがもらえます" : Number(simple_quiz["state"]) == 1 ? "初回の回答で間違えています。正解してもトークンはもらえません" : Number(simple_quiz["state"]) == 2 ? "正解しています" : ""}</h3>
-                <div className="container" style={{ "text-align": "left", "margin-bottom": "50px" }}>
-                    <h2>{quiz[2]}</h2>
-                    <br />
-                    <a style={{ "white-space": "pre-wrap", "font-size": "14px", "line-height": "1" }}>
-                        <br />
-                        {quiz[3]}
-                    </a>
-                    <br />
-                    <br />
-                    <a>出題者:{quiz[1]}</a>
-                    <br />
-                    <br />
-
-                    <div data-color-mode="light" className="left" style={{ "text-align": "left" }}>
-                        <MDEditor.Markdown source={quiz[5]} />
-                    </div>
-
-                    {(() => {
-                        if (Number(quiz[13]) == 0) {
-                            return <Answer_type1 quiz={quiz} answer={answer} setAnswer={setAnswer} />;
-                        }
-                    })()}
-                    {(() => {
-                        if (Number(quiz[13]) == 1) {
-                            return <Answer_type2 quiz={quiz} answer={answer} setAnswer={setAnswer} />;
-                        }
-                    })()}
-
-                    <div class="d-flex justify-content-end">
-                        <Button variant="primary" onClick={create_answer}>
-                            回答
-                        </Button>
-                    </div>
-                    {Number(quiz[13])}
+            <Container className="text-left">
+                <div>
+                    <h3 style={{margin: "50px"}}>{Number(simple_quiz[10]) === 0 ? "初回の回答です。正解するとトークンがもらえます" : Number(simple_quiz[10]) === 1 ? "初回の回答で間違えています。正解してもトークンはもらえません" : Number(simple_quiz[10]) === 2 ? "正解しています" : ""}</h3>
                 </div>
-                <Wait_Modal showFlag={show} content={content} />
-            </>
+                <Simple_quiz quiz={simple_quiz} />
+
+                <div data-color-mode="light" className="left" style={{textAlign: "left"}}>
+                    <MDEditor.Markdown source={quiz[5]} />
+                </div>
+                {(() => {
+                    if (Number(quiz[13]) === 0) {
+                        return <Answer_type1 quiz={quiz} answer={answer} setAnswer={setAnswer} />;
+                    }
+                })()}
+                {(() => {
+                    if (Number(quiz[13]) === 1) {
+                        return <Answer_type2 quiz={quiz} answer={answer} setAnswer={setAnswer} />;
+                    }
+                })()}
+                <div className="d-flex justify-content-end">
+                    <Button variant="primary" onClick={create_answer}>
+                        回答
+                    </Button>
+                </div>
+                <Wait_Modal showFlag={show} />
+            </Container>
         );
     } else {
-        <></>;
+        return <></>;
     }
 }
+
 export default Answer_quiz;

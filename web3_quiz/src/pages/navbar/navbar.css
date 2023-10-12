@@ -25,3 +25,6 @@
   height: 100vh;
   background-image: linear-gradient(0deg, #00dedc, #115d89, #080f1c);
 }
+.fixed-width-icon {
+  width: 100px; /* Adjust the width as needed */
+}

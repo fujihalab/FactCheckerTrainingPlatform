@@ -97,14 +97,14 @@ contract Quiz_Dapp is class_room {
 
     event Investment_to_quiz(address indexed _sender, uint indexed id);
 
-    function investment_to_quiz(uint id, uint amount, bool isNotPayingOut, uint numOfStudent) public returns (uint quiz_id) {
+    function investment_to_quiz(uint id, uint amount, uint numOfStudent) public returns (uint quiz_id) {
         require(token.allowance(msg.sender, address(this)) >= amount * numOfStudent, "Not enough token approve fees");
 
         quizs[id].reward += amount;
 
         emit Investment_to_quiz(msg.sender, id);
         require(token.transferFrom_explanation(msg.sender, address(this), amount * numOfStudent, "investment_to_quiz"), "");
-        return id;
+        quiz_id = id;
     }
 
     function get_quiz_all_data(uint _quiz_id) public view returns (uint id, address owner, string memory title, string memory explanation, string memory thumbnail_url, string memory content, uint _answer_type, string memory answer_data, uint start_time_epoch, uint time_limit_epoch, uint reward, uint respondent_count, uint respondent_limit, uint state) {

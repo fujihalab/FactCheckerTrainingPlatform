@@ -8,25 +8,8 @@ import {RiFileSettingsLine} from "react-icons/ri";
 import {AiOutlineUnorderedList} from "react-icons/ai";
 import Modal_change_network from "./Modal_change_network";
 
-function create_edit_button() {
-    return (
-        <div>
-            <div className="col-1"></div>
-            <div className="col-3">
-                <Nav.Item>
-                    <Nav.Link eventKey="edit" href={"/edit_list"}>
-                        <div className="col-12">
-                            <RiFileSettingsLine size={30} />
-                        </div>
-                        <div className="col-12 d-flex justify-content-center align-items-center">
-                            <font size="2">テストの編集</font>
-                        </div>
-                    </Nav.Link>
-                </Nav.Item>
-            </div>
-        </div>
-    );
-}
+// Custom CSS class for fixed-width icons
+const iconClass = "fixed-width-icon";
 
 function Nav_menu(props) {
     const [useing_address, Set_useing_address] = useState(null);
@@ -34,7 +17,6 @@ function Nav_menu(props) {
     const [isTeacher, setIsTeacher] = useState(false);
 
     useEffect(() => {
-        //非同期処理をUseEffect内で行う場合は、async/awaitを使用する
         const get_variable = async () => {
             setChain_id(await props.cont.get_chain_id());
             Set_useing_address(await props.cont.get_address());
@@ -43,63 +25,49 @@ function Nav_menu(props) {
 
         get_variable();
     }, []);
-    console.log(isTeacher);
+
     return (
         <>
             <Modal_change_network chain_id={chain_id} cont={props.cont} />
-            <div style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
-                <Navbar
-                    fixed="bottom"
-                    bg="light"
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                >
-                    <div className="row justify-content-center">
-                        <div className="col-3">
-                            <Nav.Item>
-                                <Nav.Link eventKey="/list_quiz" href={process.env.PUBLIC_URL + "/list_quiz"}>
-                                    <div className="col-12 ">
-                                        <AiOutlineUnorderedList size={30} />
-                                    </div>
-                                    <div className="col-12 d-flex justify-content-center align-items-center">
-                                        <font size="2">一覧</font>
-                                    </div>
-                                </Nav.Link>
-                            </Nav.Item>
+            <Navbar fixed="bottom" bg="light" className="justify-content-center" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <Nav.Item>
+                    <Nav.Link eventKey="/list_quiz" href={process.env.PUBLIC_URL + "/list_quiz"}>
+                        <AiOutlineUnorderedList size={30} className={iconClass} />
+                        <div className="d-flex justify-content-center align-items-center">
+                            <font size="2">一覧</font>
                         </div>
-                        <div className="col-1"></div>
-                        <div className="col-3">
-                            <Nav.Item>
-                                <Nav.Link eventKey="/create_quiz" href={process.env.PUBLIC_URL + "/create_quiz"}>
-                                    <div className="col-12 ">
-                                        <MdOutlineQuiz size={30} />
-                                    </div>
-                                    <div className="col-12 d-flex justify-content-center align-items-center">
-                                        <font size="2">出題</font>
-                                    </div>
-                                </Nav.Link>
-                            </Nav.Item>
+                    </Nav.Link>
+                </Nav.Item>
+
+                <Nav.Item>
+                    <Nav.Link eventKey="/create_quiz" href={process.env.PUBLIC_URL + "/create_quiz"}>
+                        <MdOutlineQuiz size={30} className={iconClass} />
+                        <div className="d-flex justify-content-center align-items-center">
+                            <font size="2">出題</font>
                         </div>
-                        <div className="col-1"></div>
-                        <div className="col-3">
-                            <Nav.Item>
-                                <Nav.Link eventKey="user_page" href={process.env.PUBLIC_URL + "/user_page/" + useing_address}>
-                                    <div className="col-12">
-                                        <AiOutlineUser size={30} />
-                                    </div>
-                                    <div className="col-12 d-flex justify-content-center align-items-center">
-                                        <font size="2">myPage</font>
-                                    </div>
-                                </Nav.Link>
-                            </Nav.Item>
+                    </Nav.Link>
+                </Nav.Item>
+
+                <Nav.Item>
+                    <Nav.Link eventKey="user_page" href={process.env.PUBLIC_URL + "/user_page/" + useing_address}>
+                        <AiOutlineUser size={30} className={iconClass} />
+                        <div className="d-flex justify-content-center align-items-center">
+                            <font size="2">myPage</font>
                         </div>
-                        {isTeacher ? create_edit_button() : ""}
-                    </div>
-                </Navbar>
-            </div>
+                    </Nav.Link>
+                </Nav.Item>
+
+                {isTeacher && (
+                    <Nav.Item>
+                        <Nav.Link eventKey="edit" href={process.env.PUBLIC_URL + "/edit_list"}>
+                            <RiFileSettingsLine size={30} className={iconClass} />
+                            <div className="d-flex justify-content-center align-items-center">
+                                <font size="2">テストの編集</font>
+                            </div>
+                        </Nav.Link>
+                    </Nav.Item>
+                )}
+            </Navbar>
         </>
     );
 }
